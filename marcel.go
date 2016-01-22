@@ -59,7 +59,7 @@ func main() {
 	args := os.Args
 
 	newArgs := []string{}
-	translateOutput := false
+	translateOutput := true
 
 	if len(args) > 1 {
 		action, present := actions[args[1]]
@@ -69,7 +69,6 @@ func main() {
 
 		if len(args) > 2 && args[2] == "--aide" {
 			newArgs = append([]string{action, "--help"}, args[3:]...)
-			translateOutput = true
 		} else {
 			translateOutput = action == "--help"
 			newArgs = append([]string{action}, args[2:]...)
@@ -84,7 +83,8 @@ func main() {
 		}
 
 		help := string(output)
-		help = strings.Replace(help, "Usage:\tdocker ", "Utilisation\tmarcel ", -1)
+		help = strings.Replace(help, "Usage:", "Utilisation:", -1)
+		help = strings.Replace(help, "docker", "marcel", -1)
 		for fr, us := range actions {
 			help = strings.Replace(help, us, fr, -1)
 		}
