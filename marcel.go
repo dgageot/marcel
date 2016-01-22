@@ -45,7 +45,7 @@ var (
 		"démarre":     "start",
 		"stats":       "stats",
 		"arrête":      "stop",
-		"labellise":   "tag",
+		"etiquette":   "tag",
 		"premiers":    "top",
 		"débloque":    "unpause",
 		"version":     "version",
