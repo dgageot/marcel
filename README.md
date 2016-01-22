@@ -1,4 +1,6 @@
 Docker dans la langue de Molière.
 
-  cp marcel /usr/local/bin
-  marcel actionne dgageot/bio
+    go get github.com/dgageot/marcel
+    marcel --aide
+    marcel lance --aide
+    marcel lance dgageot/bio
