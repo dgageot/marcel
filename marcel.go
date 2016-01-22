@@ -78,22 +78,24 @@ func main() {
 	cmd := exec.Command("docker", newArgs...)
 	if translateOutput {
 		output, err := cmd.CombinedOutput()
+
+		translated := string(output)
+		translated = strings.Replace(translated, "Usage:", "Utilisation:", -1)
+		translated = strings.Replace(translated, "docker", "marcel", -1)
+		for fr, us := range actions {
+			translated = strings.Replace(translated, us+" ", fr+" ", -1)
+		}
+
+		fmt.Print(translated)
+
 		if err != nil {
 			os.Exit(1)
 		}
-
-		help := string(output)
-		help = strings.Replace(help, "Usage:", "Utilisation:", -1)
-		help = strings.Replace(help, "docker", "marcel", -1)
-		for fr, us := range actions {
-			help = strings.Replace(help, us, fr, -1)
-		}
-
-		fmt.Print(help)
 	} else {
 		cmd.Stdin = os.Stdin
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
+
 		if err := cmd.Run(); err != nil {
 			os.Exit(1)
 		}
