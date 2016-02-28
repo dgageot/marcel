@@ -1,18 +1,31 @@
 package main
 
-import "os"
+import (
+	"os"
+	"testing"
 
-func ExampleHello() {
-	os.Args = []string{"marcel", "attache", "--aide"}
+	"github.com/stretchr/testify/assert"
+)
+
+func ExampleDockerVersion() {
+	os.Args = []string{"marcel", "--version"}
 
 	main()
 
 	// Output:
-	// Utilisation:	marcel attache [OPTIONS] CONTAINER
-	//
-	// Attach to a running container
-	//
-	//   --help=false        Print usage
-	//   --no-stdin=false    Do not attache STDIN
-	//   --sig-proxy=true    Proxy all received signals to the process
+	// Docker version 1.10.1, build 9e83765
+}
+
+func TestEmptyArgs(t *testing.T) {
+	executable, args := findCommand("marcel")
+
+	assert.Equal(t, "docker", executable)
+	assert.Equal(t, []string{}, args)
+}
+
+func TestMachineVersion(t *testing.T) {
+	executable, args := findCommand("marcel", "machine", "--version")
+
+	assert.Equal(t, "docker-machine", executable)
+	assert.Equal(t, []string{"--version"}, args)
 }

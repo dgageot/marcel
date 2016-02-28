@@ -1,0 +1,7 @@
+vendors:
+- path: github.com/davecgh/go-spew
+  rev: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+- path: github.com/pmezard/go-difflib
+  rev: 792786c7400a136282c1664665ae0a8db921c6c2
+- path: github.com/stretchr/testify
+  rev: 1f4a1643a57e798696635ea4c126e9127adb7d3c
