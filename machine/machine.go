@@ -5,23 +5,33 @@ import (
 	"strings"
 )
 
+// Enver provides the env variables for a machine name.
 type Enver interface {
 	Env(machine string) ([]string, error)
 }
 
-type CliEnver struct{}
-
+// NewEnver creates a default Enver implementation.
 var NewEnver = func() Enver {
 	return &CliEnver{}
 }
 
+// CliEnver implements Enver by running docker-machine CLI.
+type CliEnver struct{}
+
 func (cli *CliEnver) Env(machine string) ([]string, error) {
-	out, err := exec.Command("docker-machine", "env", "--shell=bash", machine).CombinedOutput()
+	out, err := exec.Command("docker-machine", "env", "--shell=bash", machine).Output()
 	if err != nil {
 		return nil, err
 	}
 
 	lines := strings.Split(string(out), "\n")
 
-	return []string{strings.Replace(lines[0][7:], `"`, "", -1), strings.Replace(lines[1][7:], `"`, "", -1), strings.Replace(lines[2][7:], `"`, "", -1)}, nil
+	return []string{removeExportAndQuotes(lines[0]), removeExportAndQuotes(lines[1]), removeExportAndQuotes(lines[2])}, nil
+}
+
+// removeExportAndQuotes converts
+// export NAME="VALUE"
+// to NAME=VALUE
+func removeExportAndQuotes(line string) string {
+	return strings.Replace(line[7:], `"`, "", -1)
 }
