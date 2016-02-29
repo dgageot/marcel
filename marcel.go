@@ -68,7 +68,7 @@ func runCommand(executable string, args []string) error {
 	return cmd.Run()
 }
 
-func run(args []string) error {
+func marcel(args []string) error {
 	switch {
 	case len(args) == 3 && args[1] == "use" && args[2] == "local":
 		return config.Save(&config.Config{
@@ -98,7 +98,7 @@ func run(args []string) error {
 }
 
 func main() {
-	if err := run(os.Args); err != nil {
+	if err := marcel(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
