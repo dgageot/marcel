@@ -10,8 +10,9 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-const configFilename = ".marcel"
+const path = ".marcel"
 
+// Config describes where to point docker CLI: local daemon, an url or a docker machine.
 type Config struct {
 	Type     string
 	Machine  string
@@ -19,13 +20,14 @@ type Config struct {
 	CertPath string
 }
 
+// Save writes the settings to the configuration file.
 func Save(config *Config) error {
 	buf, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	file, err := configFile()
+	file, err := file()
 	if err != nil {
 		return err
 	}
@@ -33,8 +35,9 @@ func Save(config *Config) error {
 	return ioutil.WriteFile(file, buf, 0644)
 }
 
+// Load reads the settings from the configuration file.
 func Load() (*Config, error) {
-	file, err := configFile()
+	file, err := file()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +64,11 @@ func Load() (*Config, error) {
 	return &config, nil
 }
 
-func configFile() (string, error) {
+func file() (string, error) {
 	home, err := homedir.Dir()
 	if err != nil {
 		return "", err
 	}
 
-	return filepath.Join(home, configFilename), nil
+	return filepath.Join(home, path), nil
 }
