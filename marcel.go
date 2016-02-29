@@ -48,15 +48,15 @@ func dockerEnv(config *config.Config) ([]string, error) {
 	return nil, fmt.Errorf("Unknown type: %s", config.Type)
 }
 
-func runCommand(executable string, args []string) {
+func runCommand(executable string, args []string) error {
 	config, err := config.Load()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	env, err := dockerEnv(config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	cmd := exec.Command(executable, args...)
@@ -65,36 +65,40 @@ func runCommand(executable string, args []string) {
 	cmd.Stdout = os.Stdout
 	cmd.Env = append(os.Environ(), env...)
 
-	if err := cmd.Run(); err != nil {
-		os.Exit(1)
-	}
+	return cmd.Run()
 }
 
-func main() {
-	args := os.Args
-
+func run(args []string) error {
 	switch {
 	case len(args) == 3 && args[1] == "use" && args[2] == "local":
-		config.Save(&config.Config{
+		return config.Save(&config.Config{
 			Type: "local",
 		})
 	case len(args) == 3 && args[1] == "use" && !strings.HasPrefix(args[2], "tcp://"):
-		config.Save(&config.Config{
+		return config.Save(&config.Config{
 			Type:    "machine",
 			Machine: args[2],
 		})
 	case len(args) == 3 && args[1] == "use":
-		config.Save(&config.Config{
+		return config.Save(&config.Config{
 			Type: "url",
 			Url:  args[2],
 		})
 	case len(args) == 4 && args[1] == "use":
-		config.Save(&config.Config{
+		return config.Save(&config.Config{
 			Type:     "url",
 			Url:      args[2],
 			CertPath: args[3],
 		})
 	default:
-		runCommand(findCommand(args...))
+		return runCommand(findCommand(args...))
+	}
+
+	return nil
+}
+
+func main() {
+	if err := run(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
