@@ -7,6 +7,8 @@ import (
 
 	"os"
 
+	"fmt"
+
 	"github.com/mitchellh/go-homedir"
 )
 
@@ -18,6 +20,18 @@ type Config struct {
 	Machine  string
 	Url      string
 	CertPath string
+}
+
+// Print prints the current configuration to the console.
+func Print() error {
+	current, err := Load()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%+v\n", current)
+
+	return nil
 }
 
 // Save writes the settings to the configuration file.

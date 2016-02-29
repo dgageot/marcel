@@ -19,7 +19,7 @@ func ExampleDockerVersion() {
 }
 
 func TestEmptyArgs(t *testing.T) {
-	executable, args := findCommand("marcel")
+	executable, args := executable("marcel")
 
 	assert.Equal(t, "docker", executable)
 	assert.Equal(t, []string{}, args)
@@ -39,7 +39,7 @@ func TestFindCommand(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		executable, args := findCommand(test.args...)
+		executable, args := executable(test.args...)
 
 		assert.Equal(t, test.expectedExecutable, executable)
 		assert.Equal(t, test.expectedArgs, args)
