@@ -23,9 +23,24 @@ func TestEmptyArgs(t *testing.T) {
 	assert.Equal(t, []string{}, args)
 }
 
-func TestMachineVersion(t *testing.T) {
-	executable, args := findCommand("marcel", "machine", "--version")
+func TestFindCommand(t *testing.T) {
+	tests := []struct {
+		args               []string
+		expectedExecutable string
+		expectedArgs       []string
+	}{
+		{[]string{"marcel"}, "docker", []string{}},
+		{[]string{"marcel", "--version"}, "docker", []string{"--version"}},
+		{[]string{"marcel", "machine", "--version"}, "docker-machine", []string{"--version"}},
+		{[]string{"marcel", "compose", "--version"}, "docker-compose", []string{"--version"}},
+		{[]string{"marcel", "run", "hello-world"}, "docker", []string{"run", "hello-world"}},
+	}
 
-	assert.Equal(t, "docker-machine", executable)
-	assert.Equal(t, []string{"--version"}, args)
+	for _, test := range tests {
+		executable, args := findCommand(test.args...)
+
+		assert.Equal(t, test.expectedExecutable, executable)
+		assert.Equal(t, test.expectedArgs, args)
+
+	}
 }
