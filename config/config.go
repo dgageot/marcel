@@ -5,17 +5,18 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"os"
+
 	"github.com/mitchellh/go-homedir"
 )
 
 const configFilename = ".marcel"
 
 type Config struct {
-	Type      string
-	Machine   string
-	Url       string
-	TlsVerify bool
-	CertPath  string
+	Type     string
+	Machine  string
+	Url      string
+	CertPath string
 }
 
 func Save(config *Config) error {
@@ -35,6 +36,14 @@ func Save(config *Config) error {
 func Load() (*Config, error) {
 	file, err := configFile()
 	if err != nil {
+		return nil, err
+	}
+
+	if _, err := os.Stat(file); err != nil {
+		if os.IsNotExist(err) {
+			return &Config{Type: "local"}, nil
+		}
+
 		return nil, err
 	}
 

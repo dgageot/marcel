@@ -1,32 +1,18 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/exec"
 
 	"strings"
 
+	"fmt"
+
 	"github.com/dgageot/marcel/config"
+	"github.com/dgageot/marcel/machine"
 )
 
-type Config struct {
-	Type      string
-	Machine   string
-	Url       string
-	TlsVerify bool
-	CertPath  string
-}
-
-// [X] marcel
-// [X] marcel [run|build|...] [...]
-// [X] marcel machine [...]
-// [X] marcel compose [...]
-// [X] marcel use machine default
-// [X] marcel use local
-// [X] marcel use tcp://192.168.99.100:2376 [~/.docker/certs]"
-// [ ] Pass config to docker
-// [ ] Pass config to docker-compose
-//
 func findCommand(args ...string) (string, []string) {
 	switch {
 	case len(args) < 2:
@@ -40,11 +26,44 @@ func findCommand(args ...string) (string, []string) {
 	}
 }
 
+func dockerEnv(config *config.Config) ([]string, error) {
+	switch config.Type {
+	case "local":
+		return []string{"DOCKER_TLS_VERIFY=", "DOCKER_HOST=", "DOCKER_CERT_PATH="}, nil
+	case "machine":
+		env, err := machine.NewEnver().Env(config.Machine)
+		if err != nil {
+			return nil, err
+		}
+
+		return env, nil
+	case "url":
+		if config.CertPath != "" {
+			return []string{"DOCKER_TLS_VERIFY=1", "DOCKER_HOST=" + config.Url, "DOCKER_CERT_PATH=" + config.CertPath}, nil
+		} else {
+			return []string{"DOCKER_TLS_VERIFY=", "DOCKER_HOST=" + config.Url, "DOCKER_CERT_PATH="}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Unknown type: %s", config.Type)
+}
+
 func runCommand(executable string, args []string) {
+	config, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	env, err := dockerEnv(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	cmd := exec.Command(executable, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
+	cmd.Env = append(os.Environ(), env...)
 
 	if err := cmd.Run(); err != nil {
 		os.Exit(1)
@@ -66,16 +85,14 @@ func main() {
 		})
 	case len(args) == 3 && args[1] == "use":
 		config.Save(&config.Config{
-			Type:      "url",
-			Url:       args[2],
-			TlsVerify: false,
+			Type: "url",
+			Url:  args[2],
 		})
 	case len(args) == 4 && args[1] == "use":
 		config.Save(&config.Config{
-			Type:      "url",
-			Url:       args[2],
-			TlsVerify: true,
-			CertPath:  args[3],
+			Type:     "url",
+			Url:      args[2],
+			CertPath: args[3],
 		})
 	default:
 		runCommand(findCommand(args...))
