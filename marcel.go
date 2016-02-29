@@ -11,8 +11,8 @@ import (
 
 func marcel(args []string) error {
 	switch {
-	case len(args) == 2 && args[1] == "config":
-		return config.Print()
+	case len(args) == 2 && args[1] == "ip":
+		return config.PrintIP()
 	case len(args) == 3 && args[1] == "use" && args[2] == "local":
 		return config.UseLocal()
 	case len(args) == 3 && args[1] == "use" && !strings.HasPrefix(args[2], "tcp://"):

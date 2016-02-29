@@ -12,13 +12,23 @@ type Enver interface {
 
 // NewEnver creates a default Enver implementation.
 var NewEnver = func() Enver {
-	return &CliEnver{}
+	return &MachineCLI{}
 }
 
-// CliEnver implements Enver by running docker-machine CLI.
-type CliEnver struct{}
+// IPer provides the IP address for a machine name.
+type IPer interface {
+	IP(machine string) (string, error)
+}
 
-func (cli *CliEnver) Env(machine string) ([]string, error) {
+// NewIPer creates a default IPer implementation.
+var NewIPer = func() IPer {
+	return &MachineCLI{}
+}
+
+// MachineCLI implements Enver and IPer by running docker-machine CLI.
+type MachineCLI struct{}
+
+func (cli *MachineCLI) Env(machine string) ([]string, error) {
 	out, err := exec.Command("docker-machine", "env", "--shell=bash", machine).Output()
 	if err != nil {
 		return nil, err
@@ -27,6 +37,15 @@ func (cli *CliEnver) Env(machine string) ([]string, error) {
 	lines := strings.Split(string(out), "\n")
 
 	return []string{removeExportAndQuotes(lines[0]), removeExportAndQuotes(lines[1]), removeExportAndQuotes(lines[2])}, nil
+}
+
+func (cli *MachineCLI) IP(machine string) (string, error) {
+	out, err := exec.Command("docker-machine", "ip", machine).Output()
+	if err != nil {
+		return "", err
+	}
+
+	return string(out), nil
 }
 
 // removeExportAndQuotes converts

@@ -22,14 +22,19 @@ type Config struct {
 	CertPath string
 }
 
-// Print prints the current configuration to the console.
-func Print() error {
+// PrintIP prints the IP of the current docker host.
+func PrintIP() error {
 	current, err := Load()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%+v\n", current)
+	ip, err := getIP(current)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(ip)
 
 	return nil
 }
