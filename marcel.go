@@ -5,13 +5,13 @@ import (
 	"os/exec"
 )
 
-// marcel
-// marcel [run|build|...] [...]
-// marcel machine [...]
-// marcel compose [...]
-// marcel use machine default
-// marcel use docker local
-// marcel use docker url certs
+// [X] marcel
+// [X] marcel [run|build|...] [...]
+// [X] marcel machine [...]
+// [X] marcel compose [...]
+// [ ] marcel use machine default
+// [ ] marcel use docker local
+// [ ] marcel use docker url certs
 func findCommand(args ...string) (string, []string) {
 	switch {
 	case len(args) < 2:
