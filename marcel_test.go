@@ -19,7 +19,7 @@ func ExampleDockerVersion() {
 }
 
 func TestEmptyArgs(t *testing.T) {
-	executable, args := executable("marcel")
+	executable, args := executable([]string{})
 
 	assert.Equal(t, "docker", executable)
 	assert.Equal(t, []string{}, args)
@@ -31,15 +31,15 @@ func TestFindCommand(t *testing.T) {
 		expectedExecutable string
 		expectedArgs       []string
 	}{
-		{[]string{"marcel"}, "docker", []string{}},
-		{[]string{"marcel", "--version"}, "docker", []string{"--version"}},
-		{[]string{"marcel", "machine", "--version"}, "docker-machine", []string{"--version"}},
-		{[]string{"marcel", "compose", "--version"}, "docker-compose", []string{"--version"}},
-		{[]string{"marcel", "run", "hello-world"}, "docker", []string{"run", "hello-world"}},
+		{[]string{}, "docker", []string{}},
+		{[]string{"--version"}, "docker", []string{"--version"}},
+		{[]string{"machine", "--version"}, "docker-machine", []string{"--version"}},
+		{[]string{"compose", "--version"}, "docker-compose", []string{"--version"}},
+		{[]string{"run", "hello-world"}, "docker", []string{"run", "hello-world"}},
 	}
 
 	for _, test := range tests {
-		executable, args := executable(test.args...)
+		executable, args := executable(test.args)
 
 		assert.Equal(t, test.expectedExecutable, executable)
 		assert.Equal(t, test.expectedArgs, args)

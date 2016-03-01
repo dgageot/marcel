@@ -9,16 +9,16 @@ import (
 	"github.com/dgageot/marcel/machine"
 )
 
-func executable(args ...string) (string, []string) {
+func executable(args []string) (string, []string) {
 	switch {
-	case len(args) < 2:
-		return "docker", args[1:]
-	case args[1] == "machine":
-		return "docker-machine", args[2:]
-	case args[1] == "compose":
-		return "docker-compose", args[2:]
+	case len(args) == 0:
+		return "docker", args
+	case args[0] == "machine":
+		return "docker-machine", args[1:]
+	case args[0] == "compose":
+		return "docker-compose", args[1:]
 	default:
-		return "docker", args[1:]
+		return "docker", args
 	}
 }
 

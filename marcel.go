@@ -11,25 +11,25 @@ import (
 
 func marcel(args []string) error {
 	switch {
-	case len(args) == 2 && args[1] == "ip":
+	case len(args) == 1 && args[0] == "ip":
 		return config.PrintIP()
-	case len(args) == 3 && args[1] == "use" && args[2] == "local":
+	case len(args) == 2 && args[0] == "use" && args[1] == "local":
 		return config.UseLocal()
-	case len(args) == 3 && args[1] == "use" && !strings.HasPrefix(args[2], "tcp://"):
-		return config.UseMachine(args[2])
-	case len(args) == 3 && args[1] == "use":
-		return config.UseUrl(args[2])
-	case len(args) == 4 && args[1] == "use":
-		return config.UseUrlWithTls(args[2], args[3])
+	case len(args) == 2 && args[0] == "use" && !strings.HasPrefix(args[1], "tcp://"):
+		return config.UseMachine(args[1])
+	case len(args) == 2 && args[0] == "use":
+		return config.UseUrl(args[1])
+	case len(args) == 3 && args[0] == "use":
+		return config.UseUrlWithTls(args[1], args[2])
 	default:
-		return run(executable(args...))
+		return run(executable(args))
 	}
 
 	return nil
 }
 
 func main() {
-	if err := marcel(os.Args); err != nil {
+	if err := marcel(os.Args[1:]); err != nil {
 		log.Fatal(err)
 	}
 }
